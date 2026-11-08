@@ -10,8 +10,8 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="border-t border-border py-16 sm:py-20">
-      <h2 className="mb-10 font-mono text-sm tracking-widest text-accent uppercase">{title}</h2>
+    <section id={id} className="border-t border-border py-12 sm:py-16">
+      <h2 className="mb-8 font-mono text-sm tracking-widest text-accent uppercase">{title}</h2>
       {children}
     </section>
   );

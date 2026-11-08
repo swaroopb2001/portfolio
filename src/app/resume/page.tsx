@@ -45,23 +45,41 @@ export default function ResumePage() {
             {profile.location} · <a href={`mailto:${profile.email}`}>{profile.email}</a> ·{" "}
             <a href={profile.links.linkedin}>{strip(profile.links.linkedin)}</a> ·{" "}
             <a href={profile.links.github}>{strip(profile.links.github)}</a>
+            {profile.links.medium && (
+              <>
+                {" · "}
+                <a href={profile.links.medium}>{strip(profile.links.medium)}</a>
+              </>
+            )}
           </p>
         </header>
 
         <Heading>Experience</Heading>
-        {experience.map((role) => (
-          <section key={role.title} className="mb-2.5 break-inside-avoid-page">
+        {experience.map((co) => (
+          <section key={co.company} className="mb-3">
             <div className="flex justify-between gap-4">
               <p>
-                <strong>{role.company}</strong> — <em>{role.title}</em>
+                <strong>{co.company}</strong> <span className="text-zinc-600">· {co.location}</span>
               </p>
-              <p className="shrink-0 font-semibold">{role.period}</p>
+              <p className="shrink-0 font-semibold">{co.period}</p>
             </div>
-            <ul className="mt-1 list-disc space-y-0.5 pl-4">
-              {(resumeBullets[role.title] ?? []).map((b) => (
-                <li key={b}>{b}</li>
-              ))}
-            </ul>
+            {co.resumeContext && <p className="text-zinc-600 italic">{co.resumeContext}</p>}
+            {co.roles.map((role) => (
+              <div key={role.title} className="mt-1.5 break-inside-avoid-page">
+                {/* Single-role entries already show the period on the company line. */}
+                <div className="flex justify-between gap-4">
+                  <p>
+                    <em className="font-semibold">{role.title}</em>
+                  </p>
+                  {co.roles.length > 1 && <p className="shrink-0 text-zinc-600">{role.period}</p>}
+                </div>
+                <ul className="mt-0.5 list-disc space-y-0.5 pl-4">
+                  {(resumeBullets[role.title] ?? []).map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </section>
         ))}
 

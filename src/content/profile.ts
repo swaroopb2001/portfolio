@@ -11,11 +11,13 @@ export const profile = {
   links: {
     github: "https://github.com/swaroopb2001",
     linkedin: "https://www.linkedin.com/in/swaroop-bharadwaj-0340b6203/",
+    // Set to your Medium profile URL to show a "More on Medium" link.
+    medium: "https://medium.com/@ssbharadwaj2001" as string,
   },
   tagline:
     "I build fast, reliable product surfaces and the backend systems behind them — currently on the care-team platform at Hinge Health.",
   about: [
-    "I'm a full-stack engineer at Hinge Health, where I've worked across four teams since joining as an intern in 2023 — from event infrastructure and GraphQL caching to the Next.js App Router platform that powers CareHub 2.0.",
+    "I'm a full-stack engineer at Hinge Health, a digital clinic for joint and muscle pain. Since joining as an intern in 2023 I've worked across four teams on the internal platform its clinicians use every day — from event infrastructure and GraphQL caching to leading parts of its rewrite on the Next.js App Router.",
     "I like owning problems end to end: digging through a production memory leak, designing a backend system from the data model up, or laying the design-system foundation other engineers build on.",
     "Before industry, I did applied ML research at BMS College of Engineering — EEG signal processing, and a multimodal advertisement-video dataset that became a Springer publication.",
   ],
@@ -24,27 +26,45 @@ export const profile = {
 export type Highlight = { title: string; points: string[]; tags: string[] };
 
 export type Role = {
-  company: string;
   title: string;
   period: string;
-  location: string;
   summary: string;
   highlights: Highlight[];
 };
 
-export const experience: Role[] = [
+export type Company = {
+  company: string;
+  url?: string;
+  period: string;
+  location: string;
+  /** One-line context on what the company/product is, shown once above the roles. */
+  context?: string;
+  /** Shorter context line for the one-page resume. */
+  resumeContext?: string;
+  roles: Role[];
+};
+
+export const experience: Company[] = [
   {
     company: "Hinge Health",
+    url: "https://www.hingehealth.com",
+    period: "Aug 2023 — Present",
+    location: "Bengaluru",
+    context:
+      "Hinge Health is a digital clinic for joint and muscle pain, pairing members with physical therapists and health coaches through an app. I work on CareHub — the internal web platform those clinicians use to manage and care for members — and its 2.0 rewrite on the Next.js App Router.",
+    resumeContext:
+      "Digital clinic for joint and muscle pain. I build CareHub, the internal web platform its physical therapists and coaches use to care for members.",
+    roles: [
+  {
     title: "Software Engineer",
     period: "Jul 2024 — Present",
-    location: "Bengaluru",
     summary:
-      "Full-stack engineer on CareHub, the platform Hinge Health's coaches, physical therapists and onboarding specialists use to care for members. Worked across Member Record, Workflows, Care Interactions and Operational Excellence teams.",
+      "Full-stack across the Member Record, Workflows, Care Interactions and Operational Excellence teams.",
     highlights: [
       {
         title: "Production stability & observability",
         points: [
-          "Led remediation of out-of-memory crashes and intermittent 503s after the CareHub 2.0 scale-up, tracing root causes across auth, GraphQL and React Server Components.",
+          "Led remediation of out-of-memory crashes and intermittent 503s as the rewritten platform scaled up, tracing root causes across auth, GraphQL and React Server Components.",
           "Stopped large error objects crossing the server–client boundary, taking error-driven memory spikes from ~70–150 MB to negligible.",
           "Trimmed error logging to actionable metadata (~34 KB → 3–4 KB per error) and fixed an Apollo Client config shipping dev-mode behaviour to production — ~40% less log volume overall.",
         ],
@@ -59,9 +79,9 @@ export const experience: Role[] = [
         tags: ["Next.js", "GraphQL", "Prefetching"],
       },
       {
-        title: "CareHub 2.0 platform & design system",
+        title: "Next.js platform & design system",
         points: [
-          "Translated Figma design tokens (colour, spacing, typography) into a scalable CSS-variable theming layer and a font-based icon system, plus core components — now used across every CareHub 2.0 feature.",
+          "Translated Figma design tokens (colour, spacing, typography) into a scalable CSS-variable theming layer and a font-based icon system, plus core components — the base every feature in the rewrite is built on.",
           "Set up runtime configuration for the Next.js App Router via Docker + Helm, solved Apollo Client for server and browser, and wired in Sentry, Datadog and Apollo DevTools.",
           "Supported the Tailwind and Next.js upgrades; authored the design-system and platform docs.",
         ],
@@ -81,7 +101,7 @@ export const experience: Role[] = [
         points: [
           "Built Member Notes end to end on the frontend, including an autosave architecture (debounce, idle triggers, persisted drafts), analytics and error boundaries.",
           "Built Member Alerts create/update/delete flows with validation and analytics.",
-          "Led the frontend for onboarding specialists' move into CareHub: six new workflows, SMS messaging for the new role, a multi-step Transfer-to-Coach flow, and a batched AI smart-summary task — helping retire a legacy tool.",
+          "Led the frontend for bringing onboarding specialists onto the platform: six new workflows, SMS messaging for the new role, a multi-step Transfer-to-Coach flow, and a batched AI smart-summary task — helping retire a legacy tool.",
         ],
         tags: ["React", "TypeScript", "GraphQL", "AI"],
       },
@@ -96,10 +116,8 @@ export const experience: Role[] = [
     ],
   },
   {
-    company: "Hinge Health",
     title: "Software Engineering Intern",
     period: "Aug 2023 — Jun 2024",
-    location: "Bengaluru",
     summary:
       "Rotated through Developer Experience, Member Record and Workflows teams before converting to full time.",
     highlights: [
@@ -114,21 +132,28 @@ export const experience: Role[] = [
       },
     ],
   },
+    ],
+  },
   {
     company: "BMS College of Engineering",
-    title: "Research Intern",
     period: "Nov 2021 — 2023",
     location: "Bengaluru",
-    summary:
-      "Analytics team on the VGST-funded project “Infrastructural Development for Neurological Disorder using Brain Signal Computing”.",
-    highlights: [
+    roles: [
       {
-        title: "Highlights",
-        points: [
-          "Preprocessed EEG signals in MATLAB and automated the pipeline with a reusable script.",
-          "Ran the pipeline on collected data and analysed it with a range of ML algorithms.",
+        title: "Research Intern",
+        period: "Nov 2021 — 2023",
+        summary:
+          "Analytics team on the VGST-funded project “Infrastructural Development for Neurological Disorder using Brain Signal Computing”.",
+        highlights: [
+          {
+            title: "Highlights",
+            points: [
+              "Preprocessed EEG signals in MATLAB and automated the pipeline with a reusable script.",
+              "Ran the pipeline on collected data and analysed it with a range of ML algorithms.",
+            ],
+            tags: ["MATLAB", "Python", "Machine learning"],
+          },
         ],
-        tags: ["MATLAB", "Python", "Machine learning"],
       },
     ],
   },
@@ -136,7 +161,76 @@ export const experience: Role[] = [
 
 export const awards = [
   "Manager Spot Award — RabbitMQ → Kafka migration",
-  "Engineering award — onboarding specialists to CareHub",
+  "Engineering award — onboarding specialists to the clinician platform",
+];
+
+// Hero stat cards. Mix of impact and credibility.
+export const stats = [
+  { value: "12×", label: "faster member page loads", detail: "~60 s → ~5 s in production" },
+  { value: "~40%", label: "less production log volume", detail: "plus ~10× smaller error logs" },
+  { value: "3+ yrs", label: "at Hinge Health", detail: "intern → software engineer" },
+  { value: "Springer", label: "published researcher", detail: "multimodal video dataset, 2025" },
+];
+
+export const beyondIntro =
+  "I'm a Kannadiga based in Bengaluru, and something of an ambivert — as happy in a packed stadium crowd as I am with a book. Away from the keyboard, it's mostly sport, music, reading and the occasional trip.";
+
+export const interests: { title: string; emoji: string; text: string }[] = [
+  {
+    title: "Football",
+    emoji: "⚽",
+    text: "FC Bayern Munich supporter — mia san mia. I watch whenever I can.",
+  },
+  {
+    title: "Tennis",
+    emoji: "🎾",
+    text: "Lifelong Rafa Nadal fan, so I watch a lot less since he retired.",
+  },
+  {
+    title: "Music",
+    emoji: "🎧",
+    text: "Mostly Kannada and Bollywood, a bit of English, and classical — Beethoven, Vivaldi.",
+  },
+  {
+    title: "Travel",
+    emoji: "🧭",
+    text: "Occasional trips — new places, new food, a break from screens.",
+  },
+];
+
+export type Book = {
+  title: string;
+  /** Title in its original script, if different. */
+  original?: string;
+  author: string;
+  language: string;
+  status: "reading" | "read";
+};
+
+// Add new books at the top. "reading" entries are always shown first.
+export const books: Book[] = [
+  { title: "Project Hail Mary", author: "Andy Weir", language: "English", status: "reading" },
+  {
+    title: "Heli Hogu Karana",
+    original: "ಹೇಳಿ ಹೋಗು ಕಾರಣ",
+    author: "Ravi Belagere",
+    language: "Kannada",
+    status: "read",
+  },
+  { title: "The Silent Patient", author: "Alex Michaelides", language: "English", status: "read" },
+  { title: "And Then There Were None", author: "Agatha Christie", language: "English", status: "read" },
+];
+
+// Blog posts. The Writing section is hidden while this is empty.
+export const writing: { title: string; url: string; summary: string; platform: string; date?: string }[] = [
+  {
+    title:
+      "The Hidden Cost of Datadog Tracing: How Our Tracer Config Blocked the Node.js Event Loop",
+    url: "https://medium.com/@ssbharadwaj2001/the-hidden-cost-of-datadog-tracing-how-our-tracer-config-blocked-the-node-js-event-loop-23156b85837b",
+    summary:
+      "A production debugging story: how an APM tracer configuration ended up blocking the Node.js event loop, how we tracked it down, and what it taught me about the performance cost of observability.",
+    platform: "Medium",
+  },
 ];
 
 export const publications = [
@@ -197,14 +291,6 @@ export const projects: Project[] = [
     ],
     tags: ["Flutter", "MongoDB", "Raspberry Pi", "RFID"],
   },
-  {
-    name: "Traffic Police DBMS",
-    period: "2022",
-    description: "Full-stack admin app for managing traffic-offence records.",
-    points: ["React frontend with a Flask + SQL backend."],
-    tags: ["React", "Flask", "SQL"],
-    link: "https://github.com/swaroopb2001/project-work-2",
-  },
 ];
 
 export const skills: { group: string; items: string[] }[] = [
@@ -240,12 +326,12 @@ export const skills: { group: string; items: string[] }[] = [
 // Condensed bullets for the one-page /resume. Keyed by experience title.
 export const resumeBullets: Record<string, string[]> = {
   "Software Engineer": [
-    "Led remediation of OOM crashes and intermittent 503s after the CareHub 2.0 scale-up across auth, GraphQL and React Server Components; cut error-driven memory spikes from ~70–150 MB to negligible and per-error logs ~10× (34 KB → 3–4 KB).",
+    "Led remediation of OOM crashes and intermittent 503s as the CareHub 2.0 rewrite scaled up, across auth, GraphQL and React Server Components; cut error-driven memory spikes from ~70–150 MB to negligible and per-error logs ~10× (34 KB → 3–4 KB).",
     "Fixed an Apollo Client config shipping dev-mode behaviour to production and streamlined error logging — ~40% reduction in Datadog log volume.",
     "Diagnosed 40–60 s member-page stalls to a slow-failing auth guard in a downstream GraphQL service; coordinated a fix taking loads from ~60 s to ~4–5 s. Drove viewport-based route prefetching, saving ~1.5–2 s per navigation.",
-    "Built the CareHub 2.0 foundation on Next.js App Router: Figma design tokens → CSS-variable theming, font-based icon system, core components, Docker + Helm runtime config, server/browser Apollo Client, Sentry and Datadog.",
+    "Built the rewrite's foundation on Next.js App Router: Figma design tokens → CSS-variable theming, font-based icon system, core components, Docker + Helm runtime config, server/browser Apollo Client, Sentry and Datadog.",
     "Designed and delivered backend systems in NestJS/TypeScript: member Snooze (data model, lifecycle, prioritisation suppression, domain events); computer-vision assessment workflows (state machine, rule-based next-best-action, Kafka → Aurora persistence); Weekly Goals migration.",
-    "Built Member Notes (debounced/idle autosave with persisted drafts) and Member Alerts; led the frontend for onboarding specialists' move into CareHub — 6 workflows, SMS messaging, Transfer-to-Coach, AI smart summaries — enabling a legacy tool's retirement.",
+    "Built Member Notes (debounced/idle autosave with persisted drafts) and Member Alerts; led the frontend for bringing onboarding specialists onto the platform — 6 workflows, SMS messaging, Transfer-to-Coach, AI smart summaries — enabling a legacy tool's retirement.",
     "Migrated 64 events across 3 services from RabbitMQ to Kafka with flag-gated cutovers, removing duplicate real-time socket events; added Kafka-driven Apollo cache invalidation. Manager Spot Award.",
   ],
   "Software Engineering Intern": [

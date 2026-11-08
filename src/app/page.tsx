@@ -1,14 +1,21 @@
 import Link from "next/link";
+import { Bookshelf } from "@/components/bookshelf";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ExternalLink, Section, TagList } from "@/components/ui";
 import {
   awards,
+  beyondIntro,
+  books,
   education,
   experience,
+  interests,
   profile,
   projects,
   publications,
   skills,
+  stats,
+  writing,
+  type Highlight,
 } from "@/content/profile";
 
 const nav = [
@@ -16,16 +23,37 @@ const nav = [
   { href: "#experience", label: "Experience" },
   { href: "#research", label: "Research" },
   { href: "#projects", label: "Projects" },
+  ...(writing.length ? [{ href: "#writing", label: "Writing" }] : []),
   { href: "#skills", label: "Skills" },
   { href: "#contact", label: "Contact" },
 ];
 
-const stats = [
-  { value: "~40%", label: "less production log volume" },
-  { value: "60s → 5s", label: "member page load fix" },
-  { value: "64", label: "events migrated to Kafka" },
-  { value: "4", label: "teams shipped with" },
-];
+// Highlight cards shown per role before the "Show more" toggle.
+const VISIBLE_HIGHLIGHTS = 4;
+
+function BulletList({ points }: { points: string[] }) {
+  return (
+    <ul className="list-disc space-y-2 pl-4 text-sm leading-relaxed text-muted marker:text-accent">
+      {points.map((p) => (
+        <li key={p}>{p}</li>
+      ))}
+    </ul>
+  );
+}
+
+function HighlightCard({ h }: { h: Highlight }) {
+  return (
+    <section className="flex flex-col rounded-lg border border-border bg-surface p-5">
+      <h5 className="font-medium">{h.title}</h5>
+      <div className="mt-3 flex-1">
+        <BulletList points={h.points} />
+      </div>
+      <div className="mt-4">
+        <TagList tags={h.tags} />
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   return (
@@ -84,11 +112,23 @@ export default function Home() {
               LinkedIn
             </ExternalLink>
           </div>
-          <dl className="mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4">
+          <dl className="mt-16 grid grid-cols-2 gap-4 lg:grid-cols-4">
             {stats.map((s) => (
-              <div key={s.label} className="flex flex-col-reverse rounded-lg border border-border bg-surface p-4">
-                <dt className="mt-1 text-xs text-muted">{s.label}</dt>
-                <dd className="text-2xl font-semibold text-accent">{s.value}</dd>
+              <div
+                key={s.label}
+                className="group relative flex flex-col-reverse overflow-hidden rounded-xl border border-border bg-surface p-5 transition hover:border-accent/60"
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent to-transparent opacity-60"
+                />
+                <dt>
+                  <span className="mt-2 block text-sm font-medium text-fg">{s.label}</span>
+                  <span className="mt-1 block font-mono text-xs text-muted">{s.detail}</span>
+                </dt>
+                <dd className="text-3xl font-semibold tracking-tight text-accent sm:text-4xl">
+                  {s.value}
+                </dd>
               </div>
             ))}
           </dl>
@@ -122,37 +162,85 @@ export default function Home() {
         </Section>
 
         <Section id="experience" title="Experience">
-          <ol className="space-y-16">
-            {experience.map((role) => (
-              <li key={`${role.company}-${role.title}`} className="relative border-l border-border pl-6">
-                <span className="absolute top-1.5 -left-[5px] size-2.5 rounded-full bg-accent" aria-hidden />
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h3 className="text-xl font-semibold">
-                    {role.title} <span className="text-muted">· {role.company}</span>
+          <div className="space-y-20">
+            {experience.map((co) => (
+              <article key={co.company}>
+                <header className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h3 className="text-2xl font-semibold">
+                    {co.url ? (
+                      <ExternalLink href={co.url} className="hover:text-accent">
+                        {co.company}
+                      </ExternalLink>
+                    ) : (
+                      co.company
+                    )}
                   </h3>
                   <p className="font-mono text-xs text-muted">
-                    {role.period} · {role.location}
+                    {co.period} · {co.location}
                   </p>
-                </div>
-                <p className="mt-3 max-w-3xl text-muted">{role.summary}</p>
-                <div className="mt-8 grid gap-5 md:grid-cols-2">
-                  {role.highlights.map((h) => (
-                    <article key={h.title} className="flex flex-col rounded-lg border border-border bg-surface p-5">
-                      <h4 className="font-medium">{h.title}</h4>
-                      <ul className="mt-3 flex-1 list-disc space-y-2 pl-4 text-sm leading-relaxed text-muted marker:text-accent">
-                        {h.points.map((p) => (
-                          <li key={p}>{p}</li>
-                        ))}
-                      </ul>
-                      <div className="mt-4">
-                        <TagList tags={h.tags} />
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </li>
+                </header>
+                {co.context && (
+                  <p className="mt-3 max-w-3xl leading-relaxed text-muted">{co.context}</p>
+                )}
+
+                {/* One continuous timeline line per company; each role gets a dot on it. */}
+                <ol className="mt-10 space-y-12 border-l border-border">
+                  {co.roles.map((role) => {
+                    const visible = role.highlights.slice(0, VISIBLE_HIGHLIGHTS);
+                    const hidden = role.highlights.slice(VISIBLE_HIGHLIGHTS);
+                    const single = role.highlights.length === 1 ? role.highlights[0] : null;
+                    return (
+                      <li key={role.title} className="relative pl-6">
+                        <span
+                          className="absolute top-2 -left-1.25 size-2.5 rounded-full bg-accent ring-4 ring-bg"
+                          aria-hidden
+                        />
+                        <div className="flex flex-wrap items-baseline justify-between gap-2">
+                          <h4 className="text-lg font-semibold">{role.title}</h4>
+                          <p className="font-mono text-xs text-muted">{role.period}</p>
+                        </div>
+                        <p className="mt-2 max-w-3xl text-muted">{role.summary}</p>
+
+                        {single ? (
+                          // A lone "Highlights" group reads better as a plain list than a half-width card.
+                          <div className="mt-4 max-w-3xl">
+                            <BulletList points={single.points} />
+                            <div className="mt-4">
+                              <TagList tags={single.tags} />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-6 grid gap-5 md:grid-cols-2">
+                            {visible.map((h) => (
+                              <HighlightCard key={h.title} h={h} />
+                            ))}
+                            {hidden.length > 0 && (
+                              <details className="group md:col-span-2">
+                                <summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm text-muted transition select-none hover:border-accent hover:text-fg [&::-webkit-details-marker]:hidden">
+                                  <span className="group-open:hidden">
+                                    Show {hidden.length} more: {hidden.map((h) => h.title).join(", ")}
+                                  </span>
+                                  <span className="hidden group-open:inline">Show less</span>
+                                  <span aria-hidden className="transition group-open:rotate-180">
+                                    ▾
+                                  </span>
+                                </summary>
+                                <div className="mt-5 grid gap-5 md:grid-cols-2">
+                                  {hidden.map((h) => (
+                                    <HighlightCard key={h.title} h={h} />
+                                  ))}
+                                </div>
+                              </details>
+                            )}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              </article>
             ))}
-          </ol>
+          </div>
         </Section>
 
         <Section id="research" title="Research">
@@ -201,6 +289,36 @@ export default function Home() {
           </div>
         </Section>
 
+        {writing.length > 0 && (
+          <Section id="writing" title="Writing">
+            <ul className="grid gap-5 md:grid-cols-2">
+              {writing.map((w) => (
+                <li key={w.url}>
+                  <ExternalLink
+                    href={w.url}
+                    className="block h-full rounded-lg border border-border bg-surface p-5 transition hover:border-accent"
+                  >
+                    <p className="font-mono text-xs text-accent">
+                      {w.platform}
+                      {w.date ? ` · ${w.date}` : ""}
+                    </p>
+                    <h3 className="mt-2 font-medium">{w.title} ↗</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">{w.summary}</p>
+                  </ExternalLink>
+                </li>
+              ))}
+            </ul>
+            {profile.links.medium && (
+              <ExternalLink
+                href={profile.links.medium}
+                className="mt-6 inline-block text-sm text-muted hover:text-accent"
+              >
+                More on Medium ↗
+              </ExternalLink>
+            )}
+          </Section>
+        )}
+
         <Section id="skills" title="Skills">
           <dl className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {skills.map((s) => (
@@ -216,6 +334,22 @@ export default function Home() {
             This site is built with the same stack I use at work: Next.js App Router, React Server
             Components, TypeScript and Tailwind CSS, deployed on Vercel.
           </p>
+        </Section>
+
+        <Section id="beyond" title="Beyond code">
+          <p className="mb-8 max-w-3xl leading-relaxed text-muted">{beyondIntro}</p>
+          <ul className="mb-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {interests.map((i) => (
+              <li key={i.title} className="rounded-lg border border-border bg-surface p-5">
+                <p className="text-2xl" aria-hidden>
+                  {i.emoji}
+                </p>
+                <h3 className="mt-3 font-medium">{i.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{i.text}</p>
+              </li>
+            ))}
+          </ul>
+          <Bookshelf books={books} />
         </Section>
 
         <Section id="contact" title="Contact">
